@@ -1,0 +1,43 @@
+* {
+    touch-action: manipulation;
+}
+
+html, body {
+    padding: 0;
+    margin: 0;
+    overflow: hidden;
+    background: #F5F5F5;
+    font-family: 'FlappyBirdy';
+    background-image: url('res/bacgrkound.gif');
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-size: 100% 100%;
+}
+
+#divCanvas {
+    background-color: transparent;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+    position: absolute;
+}
+
+img {
+    position: absolute;
+    top: 55%;
+    left: 50%;
+}
+
+@font-face {
+    font-family: 'FlappyBirdy';
+    src: url('res/font/FlappyBirdy.ttf');
+    src: local('FlappyBirdy Regular'), local('FlappyBirdy'),
+      url("res/font/FlappyBirdy.ttf") format("truetype"),
+  }
+
+  @font-face {
+    font-family: 'FlappyBirdy2';
+    src: url('res/font/FlappyBirdRegular-9Pq0.ttf');
+    src: local('FlappyBirdy Regular'), local('FlappyBirdy2'),
+      url("res/font//FlappyBirdRegular-9Pq0.ttf") format("truetype"),
+  }
