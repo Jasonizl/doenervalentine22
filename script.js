@@ -187,7 +187,6 @@ function draw() {
             ctx.fillText(`SCORE ${score}`, 20, 120);
 
             /* Draw the player */
-            console.log(doener.width);
             ctx.drawImage(doener.image, doener.x, doener.y, doener.width, doener.height);
             break;
         case 'end':
