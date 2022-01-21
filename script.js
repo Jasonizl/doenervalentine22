@@ -19,6 +19,12 @@ const pipeUp = new Image();
 const pipeDown = new Image();
 const pipeScale = 1.25;
 
+/* BACKGROUND */
+const background1 = new Image();
+const background2 = new Image();
+
+let background1Speed = -1;
+
 let velocityY = 0;
 let gravity = 0.4;
 
@@ -30,6 +36,8 @@ let frameCount = 0;
 let fps = 60, fpsInterval, startTime, now, then, elapsed;
 let score = 0;
 let currentScreen = "start"; // start - game - pause - end
+
+let timeEnded;
 
 let gaps;
 let gapsPos = [GAP_BETWEEN_PIPES, GAP_BETWEEN_PIPES*2, GAP_BETWEEN_PIPES*3]
@@ -70,6 +78,8 @@ function init() {
     pipe.src = 'res/pipe.png';
     pipeUp.src = 'res/pipe_up.png';
     pipeDown.src = 'res/pipe_down.png';
+    background1.src = 'res/second_background.png';
+    background2.src = 'res/first_background.png';
     // pipes and stuff
     gaps = [getGap(), getGap(), getGap()];
     resizeCanvasToBrowserSize();
@@ -92,10 +102,11 @@ function logic() {
         let doenerTop = doener.y, doenerBottom = doener.y + doener.height, doenerWidth = doener.width;
 
         // tweak the hundred for more forgiving exit collision detecting
-        if (gapsPos[0] + gapX < doenerWidth && gapsPos[0] + gapX > -(pipe.width * pipeScale) + 100) {
+        if (gapsPos[0] + gapX < doenerWidth - 50 && gapsPos[0] + gapX > -(pipe.width * pipeScale) + 100) {
             if (doenerTop < gaps[0] || doenerBottom > gaps[0] + GAP_SIZE ) {
                 // At this stage you lost the game
-                paused = true;
+                currentScreen = 'end';
+                timeEnded = Date.now();
             }
         }
         // when pipe is out of screen, add one score and replace old pipe with new pipe
@@ -105,7 +116,15 @@ function logic() {
         }
     }
 
+    background1Speed = (background1Speed - 1.5) % background1.width;
+
 }
+
+const win0 = ['Döner gesammelt!', 'Probiers nochmal!', '🥺']
+const win3 = ['Döner gesammelt!', 'Da seh ich', 'mehr Dönerpotential!', '🤩']
+const win5 = ['Döner gesammelt!', 'Das ist meine', 'Marie!', '😍']
+const win10 = ['Döner gesammelt!', 'Das ist meine', 'Dönerfrau!', '😍❤️']
+
 
 function draw() {
     const canvas = document.getElementById("canvas");
@@ -116,12 +135,9 @@ function draw() {
     ctx.font = '200px FlappyBirdy2';
     ctx.fillStyle = 'black';
 
-
-
     switch (currentScreen) {
         case 'start': 
             ctx.font = '200px FlappyBirdy';
-            console.log(ctx.measureText('Flappy Doener'))
             ctx.fillText(`Flappy Doener`, ((WINDOW_WIDTH - ctx.measureText('Flappy Doener').width)/2), MIDDLE_OF_SCREEN);
             if(!isStartScreenRendered) {
                 const startScreenImage = new Image();
@@ -140,6 +156,12 @@ function draw() {
                 isStartScreenRendered = false;
             }
             /* Draw the background */
+            for(let i = 0; i < 4; i++) {
+                ctx.drawImage(background1, ((background1.width*i) + background1Speed), 0, background1.width, ctx.canvas.height);
+                // cant use another variable because the drawing wont work properly somehow...
+                ctx.drawImage(background2, ((background2.width*i) + background1Speed*2), 0, background2.width, ctx.canvas.height);
+            }
+
 
             /* Draw the pipes */
             let index = 0;
@@ -159,11 +181,46 @@ function draw() {
             /* Draw the player */
             ctx.drawImage(doener.image, doener.x, doener.y, doener.width, doener.height);
             break;
-        case 'pause':
-            break;
         case 'end':
+            let win;
+            if(score >= 10) {
+                win = win10;
+            } else if (score >= 5) {
+                win = win5;
+            } else if (score >= 3) {
+                win = win3;
+            } else {
+                win = win0;
+            }
+            ctx.font = '75px Verdana';
+            let offset = 100;
+            for (let i = 0; i < win.length; i++) {
+                let text = win[i];
+                if (i === 0) {
+                    text = `${score} ${win[i]}`;
+                }
+                ctx.fillText(text, ((WINDOW_WIDTH - ctx.measureText(text).width)/2), MIDDLE_OF_SCREEN-offset);
+                if (i===0) {
+                    offset -= 200;
+                }else {
+                    offset -= 100;
+                }
+            }
+            text = 'tap to play again';
+            ctx.fillText(text, ((WINDOW_WIDTH - ctx.measureText(text).width)/2), MIDDLE_OF_SCREEN-offset + 300);
             break;
     }
+}
+
+function drawPauseScreen() {
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle= 'white';
+    ctx.clearRect(0,0, ctx.canvas.width, ctx.canvas.height); 
+    ctx.font = '75px Verdana';
+    ctx.fillStyle = 'black';
+    text = 'tap to unpause';
+    ctx.fillText(text, ((WINDOW_WIDTH - ctx.measureText(text).width)/2), MIDDLE_OF_SCREEN);
 }
 
 function loop() {
@@ -179,6 +236,9 @@ function loop() {
             logic();
             draw();
         }
+    } 
+    else {
+        drawPauseScreen();
     }
 }
 
@@ -194,12 +254,17 @@ function unpause() {
     paused = false;
 }
 
-window.addEventListener('blur', pause);
+window.addEventListener('blur', () => {
+    if (currentScreen === 'game' || currentScreen === 'start') {
+        pause();
+        currentScreen = 'paused'
+    }
+});
 
 function myClick(e) {
     if (currentScreen === 'game') {
         if (paused) {
-            paused = false;
+            unpause();
             return;
         }
         if(velocityY < -4) {
@@ -207,8 +272,12 @@ function myClick(e) {
         } else {
             velocityY = -12;
         } 
-    } else {
+    } else if(currentScreen === 'paused' || currentScreen === 'start') {
         currentScreen = 'game';
-        paused = false;
+        unpause();
+    } else if (currentScreen === 'end') {
+        if (Date.now()- timeEnded > 1000) {
+            location.reload();
+        }
     }
 }

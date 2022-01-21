@@ -8,7 +8,6 @@ html, body {
     overflow: hidden;
     background: #F5F5F5;
     font-family: 'FlappyBirdy';
-    background-image: url('res/bacgrkound.gif');
     background-repeat: no-repeat;
     background-attachment: fixed;
     background-size: 100% 100%;
