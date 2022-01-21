@@ -1,6 +1,5 @@
 const WINDOW_HEIGHT = window.innerHeight, WINDOW_WIDTH = window.innerWidth;
 const MIDDLE_OF_SCREEN = WINDOW_HEIGHT / 2;
-const scaleDoener = 0.4;
 const GAP_BETWEEN_PIPES = WINDOW_WIDTH - 50;
 const GAP_SIZE = 450; // change dynamically to 400 when score is higher
 
@@ -32,7 +31,6 @@ let isStartScreenRendered = false;
 
 /* GAME VARIABLES */
 let paused = false;
-let frameCount = 0;
 let fps = 60, fpsInterval, startTime, now, then, elapsed;
 let score = 0;
 let currentScreen = "start"; // start - game - pause - end
@@ -59,6 +57,7 @@ function resizeCanvasToBrowserSize() {
     ctx.canvas.width = WINDOW_WIDTH;
     ctx.canvas.height = WINDOW_HEIGHT;
     if (doener.width === 0 || doener.height === 0) {
+        const scaleDoener = 0.4;
         doener.width = doener.image.width * scaleDoener;
         doener.height = doener.image.height * scaleDoener;
         doener.y = MIDDLE_OF_SCREEN - (doener.height/2);
@@ -67,14 +66,23 @@ function resizeCanvasToBrowserSize() {
 }
 
 function init() {
+    currentScreen = "start";
+    score = 0;
+    paused = false;
+    gapX = 0;
+    gapsPos = [GAP_BETWEEN_PIPES, GAP_BETWEEN_PIPES*2, GAP_BETWEEN_PIPES*3]
+    velocityY = 0;
+    gravity = 0.4;
     // game engine stuff
     fpsInterval = 1000 / fps;
     then = Date.now();
     startTime = then;
     // Image stuff
     doener.image.src = 'res/doener.png';
-    doener.width = doener.image.width;
-    doener.height = doener.image.height;
+    const scaleDoener = 0.4;
+    doener.width = doener.image.width * scaleDoener;
+    doener.height = doener.image.height * scaleDoener;
+    doener.y = MIDDLE_OF_SCREEN;
     pipe.src = 'res/pipe.png';
     pipeUp.src = 'res/pipe_up.png';
     pipeDown.src = 'res/pipe_down.png';
@@ -179,6 +187,7 @@ function draw() {
             ctx.fillText(`SCORE ${score}`, 20, 120);
 
             /* Draw the player */
+            console.log(doener.width);
             ctx.drawImage(doener.image, doener.x, doener.y, doener.width, doener.height);
             break;
         case 'end':
@@ -276,8 +285,8 @@ function myClick(e) {
         currentScreen = 'game';
         unpause();
     } else if (currentScreen === 'end') {
-        if (Date.now()- timeEnded > 1000) {
-            location.reload();
+        if (Date.now()- timeEnded > 750) {
+            init();
         }
     }
 }
