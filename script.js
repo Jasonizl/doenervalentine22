@@ -18,6 +18,17 @@ const pipeUp = new Image();
 const pipeDown = new Image();
 const pipeScale = 1.25;
 
+const sound = new Howl({
+    src: ['res/tap.mp3'],
+    volume: 0.15,
+});
+
+const sound2 = new Howl({
+    src: ['res/win.mp3'],
+    volume: 0.15,
+});
+
+
 /* BACKGROUND */
 const background1 = new Image();
 const background2 = new Image();
@@ -113,8 +124,11 @@ function logic() {
         if (gapsPos[0] + gapX < doenerWidth - 50 && gapsPos[0] + gapX > -(pipe.width * pipeScale) + 100) {
             if (doenerTop < gaps[0] || doenerBottom > gaps[0] + GAP_SIZE ) {
                 // At this stage you lost the game
-                currentScreen = 'end';
-                timeEnded = Date.now();
+                if (currentScreen !== 'end') {
+                    currentScreen = 'end';
+                    timeEnded = Date.now();         
+                    sound2.play();
+                }
             }
         }
         // when pipe is out of screen, add one score and replace old pipe with new pipe
@@ -133,6 +147,7 @@ const win3 = ['Döner gesammelt!', 'Da seh ich', 'mehr Dönerpotential!', '🤩'
 const win5 = ['Döner gesammelt!', 'Das ist meine', 'Marie!', '😍']
 const win10 = ['Döner gesammelt!', 'Das ist meine', 'Dönerfrau!', '😍❤️']
 
+/* TODO https://stackoverflow.com/questions/9419263/how-to-play-audio */
 
 function draw() {
     const canvas = document.getElementById("canvas");
@@ -275,8 +290,9 @@ function myClick(e) {
             unpause();
             return;
         }
-        if(velocityY < -4) {
-            velocityY -= 4;
+        sound.play();
+        if(velocityY < 0) {
+            velocityY -= 6;
         } else {
             velocityY = -12;
         } 
