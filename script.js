@@ -12,6 +12,8 @@ const doener = {
     image: new Image(),
 }
 
+let initCounter = 0;
+
 /* PIPES */ 
 const pipe = new Image();
 const pipeUp = new Image();
@@ -89,16 +91,10 @@ function init() {
     then = Date.now();
     startTime = then;
     // Image stuff
-    doener.image.src = 'res/doener.png';
     const scaleDoener = 0.4;
     doener.width = doener.image.width * scaleDoener;
     doener.height = doener.image.height * scaleDoener;
     doener.y = MIDDLE_OF_SCREEN;
-    pipe.src = 'res/pipe.png';
-    pipeUp.src = 'res/pipe_up.png';
-    pipeDown.src = 'res/pipe_down.png';
-    background1.src = 'res/second_background.png';
-    background2.src = 'res/first_background.png';
     // pipes and stuff
     gaps = [getGap(), getGap(), getGap()];
     resizeCanvasToBrowserSize();
@@ -265,8 +261,26 @@ function loop() {
     }
 }
 
+incrememtInitchecker = () => {
+    initCounter++;
+    if (initCounter === 6) {
+        init();
+    }
+} 
+
 window.onload = (event) => {
-    init();
+    doener.image.onload = () => incrememtInitchecker();
+    pipe.onload = () => incrememtInitchecker();
+    pipeUp.onload = () => incrememtInitchecker();
+    pipeDown.onload = () => incrememtInitchecker();
+    background1.onload = () => incrememtInitchecker();
+    background2.onload = () => incrememtInitchecker();
+    doener.image.src = 'res/doener.png';
+    pipe.src = 'res/pipe.png';
+    pipeUp.src = 'res/pipe_up.png';
+    pipeDown.src = 'res/pipe_down.png';
+    background1.src = 'res/second_background.png';
+    background2.src = 'res/first_background.png';
 }
 
 function pause() {
