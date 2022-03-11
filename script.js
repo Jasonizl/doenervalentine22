@@ -99,9 +99,8 @@ function init() {
     gaps = [getGap(), getGap(), getGap()];
     resizeCanvasToBrowserSize();
 
-    /*window.onclick = myClick;
-    document.ontouchstart = myTouch2;
-    document.ontouchend = myTouch;*/
+    document.ontouchstart = touchStart;
+    document.ontouchend = touchEnd;   
     window.onclick = myClick;
     window.requestAnimationFrame(loop);
 }
@@ -298,7 +297,7 @@ window.addEventListener('blur', () => {
     }
 });
 
-function myClick(e) {
+function tapAction() {
     if (currentScreen === 'game') {
         if (paused) {
             unpause();
@@ -318,4 +317,17 @@ function myClick(e) {
             init();
         }
     }
+}
+
+function myClick(e) {
+    tapAction();
+}
+
+function touchStart(e) {
+    e.preventDefault();
+    tapAction();
+}
+
+function touchEnd(e) {
+    e.preventDefault();
 }
